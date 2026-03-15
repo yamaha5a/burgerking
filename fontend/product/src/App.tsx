@@ -9,6 +9,7 @@ import AdminLayout from "./component/admin/layoutadmin/layoutadmin"
 import AdminProtectedRoute from "./component/admin/AdminProtectedRoute"
 import AdminLogin from "./component/admin/adminLogin/AdminLogin"
 import Content from "./component/admin/adminHome/content"
+import BannerAdmin from "./component/admin/component/bannerAdmin"
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
         }
       >
         <Route index element={<Content />} />
+        <Route path="banners" element={<BannerAdmin />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

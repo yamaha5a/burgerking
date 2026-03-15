@@ -1,61 +1,75 @@
-import { useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 import { useAuth } from "../../../context/AuthContext"
 
 export default function Sidebar() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
 
   const handleLogout = () => {
     logout()
     navigate("/admin/login", { replace: true })
   }
+
+  const isActive = (path: string) => location.pathname === path
+
   return (
     <aside
-      className="d-none d-md-flex flex-column bg-dark text-white p-3 border-end"
-      style={{ width: 260 }}
+      className="d-none d-md-flex flex-column bg-dark text-white p-3 border-end shadow-sm"
+      style={{ width: 260, background: "linear-gradient(180deg, #020617 0%, #111827 35%, #020617 100%)" }}
     >
-      <div className="d-flex align-items-center mb-4">
-        <div
-          className="rounded-circle d-flex align-items-center justify-content-center bg-primary me-2"
-          style={{ width: 36, height: 36 }}
-        >
-          <span className="fw-bold">ADM</span>
-        </div>
-        <div>
-          <div className="fw-semibold">Admin Panel</div>
-          <div className="small text-white-50">Subnautica</div>
-        </div>
-      </div>
-
       <nav className="flex-grow-1">
+        <h6 className="text-uppercase text-white-50 fw-semibold mb-3 small">
+          Bảng điều khiển
+        </h6>
         <ul className="nav nav-pills flex-column gap-1">
           <li className="nav-item">
-            <button className="nav-link text-start text-white bg-primary">
+            <button
+              className={`nav-link text-start rounded-3 ${
+                isActive("/admin") ? "bg-primary text-white" : "text-white-50"
+              }`}
+              onClick={() => navigate("/admin")}
+            >
               Tổng quan
             </button>
           </li>
           <li className="nav-item">
-            <button className="nav-link text-start text-white-50">
+            <button className="nav-link text-start text-white-50 rounded-3">
               Đơn hàng
             </button>
           </li>
           <li className="nav-item">
-            <button className="nav-link text-start text-white-50">
+            <button className="nav-link text-start text-white-50 rounded-3">
               Sản phẩm
             </button>
           </li>
           <li className="nav-item">
-            <button className="nav-link text-start text-white-50">
+            <button className="nav-link text-start text-white-50 rounded-3">
               Khách hàng
             </button>
           </li>
           <li className="nav-item">
-            <button className="nav-link text-start text-white-50">
+            <button className="nav-link text-start text-white-50 rounded-3">
               Báo cáo
             </button>
           </li>
           <li className="nav-item mt-3">
-            <button className="nav-link text-start text-white-50">
+            <h6 className="text-uppercase text-white-50 fw-semibold mb-2 small">
+              Nội dung
+            </h6>
+          </li>
+          <li className="nav-item mt-3">
+            <button
+              className={`nav-link text-start rounded-3 ${
+                isActive("/admin/banners") ? "bg-primary text-white" : "text-white-50"
+              }`}
+              onClick={() => navigate("/admin/banners")}
+            >
+              Quản lý banner
+            </button>
+          </li>
+          <li className="nav-item mt-2">
+            <button className="nav-link text-start text-white-50 rounded-3">
               Cài đặt
             </button>
           </li>

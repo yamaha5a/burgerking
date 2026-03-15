@@ -1,96 +1,97 @@
-import React from 'react'
+import { useEffect, useState, useRef, type CSSProperties } from "react";
 
-const banner = () => {
-  return (
-    <>
-    {/* Hero Start */}
-      <div className="container-fluid py-5 mb-5 hero-header">
-        <div className="container py-5">
-          <div className="row g-5 align-items-center">
-            <div className="col-md-12 col-lg-7">
-              <h4 className="mb-3 text-secondary">100% Organic Foods</h4>
-              <h1 className="mb-5 display-3 text-primary">
-                Organic Veggies & Fruits Foods
-              </h1>
-              <div className="position-relative mx-auto">
-                <input
-                  className="form-control border-2 border-secondary w-75 py-3 px-4 rounded-pill"
-                  type="number"
-                  placeholder="Search"
-                />
-                <button
-                  type="submit"
-                  className="btn btn-primary border-2 border-secondary py-3 px-4 position-absolute rounded-pill text-white h-100"
-                  style={{ top: 0, right: "25%" }}
-                >
-                  Submit Now
-                </button>
-              </div>
-            </div>
-
-            <div className="col-md-12 col-lg-5">
-              <div
-                id="carouselId"
-                className="carousel slide position-relative"
-                data-bs-ride="carousel"
-              >
-                <div className="carousel-inner" role="listbox">
-                  <div className="carousel-item active rounded">
-                    <img
-                      src="img/hero-img-1.png"
-                      className="img-fluid w-100 h-100 bg-secondary rounded"
-                      alt="First slide"
-                    />
-                    <a href="#" className="btn px-4 py-2 text-white rounded">
-                      Fruites
-                    </a>
-                  </div>
-
-                  <div className="carousel-item rounded">
-                    <img
-                      src="img/hero-img-2.jpg"
-                      className="img-fluid w-100 h-100 rounded"
-                      alt="Second slide"
-                    />
-                    <a href="#" className="btn px-4 py-2 text-white rounded">
-                      Vesitables
-                    </a>
-                  </div>
-                </div>
-
-                <button
-                  className="carousel-control-prev"
-                  type="button"
-                  data-bs-target="#carouselId"
-                  data-bs-slide="prev"
-                >
-                  <span
-                    className="carousel-control-prev-icon"
-                    aria-hidden="true"
-                  ></span>
-                  <span className="visually-hidden">Previous</span>
-                </button>
-
-                <button
-                  className="carousel-control-next"
-                  type="button"
-                  data-bs-target="#carouselId"
-                  data-bs-slide="next"
-                >
-                  <span
-                    className="carousel-control-next-icon"
-                    aria-hidden="true"
-                  ></span>
-                  <span className="visually-hidden">Next</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      {/* Hero End */}
-    </>
-  )
+interface Banner {
+  _id: string;
+  id: number;
+  image: string;
+  text: string;
+  font?: string;
+  createdAt?: string;
 }
 
-export default banner
+const BannerSection = () => {
+  const [banners, setBanners] = useState<Banner[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const intervalRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch("/api/banners");
+        if (!res.ok) throw new Error("Failed to fetch banners");
+        const data: Banner[] = await res.json();
+        setBanners(data);
+      } catch (err) {
+        console.error("Không thể tải banner:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    if (banners.length <= 1) return;
+
+    if (intervalRef.current) {
+      window.clearInterval(intervalRef.current);
+    }
+
+    intervalRef.current = window.setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % banners.length);
+    }, 5000);
+
+    return () => {
+      if (intervalRef.current) {
+        window.clearInterval(intervalRef.current);
+      }
+    };
+  }, [banners.length]);
+
+  const mainBanner = banners[currentIndex] || banners[0];
+
+  const heroStyle: CSSProperties | undefined = mainBanner?.image
+    ? {
+        backgroundImage: `url(${mainBanner.image})`,
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "cover",
+      }
+    : undefined;
+
+  return (
+    <>
+      <div
+        className="container-fluid py-5 mb-5 hero-header"
+        style={heroStyle}
+      >
+        <div className="container py-5" style={{ minHeight: 420 }} />
+        
+        {/* Slider dots */}
+        {banners.length > 1 && (
+          <div className="mt-3 d-flex justify-content-center gap-2">
+            {banners.map((b, index) => (
+              <button
+                key={b._id}
+                type="button"
+                onClick={() => setCurrentIndex(index)}
+                className={`border-0 rounded-circle ${
+                  index === currentIndex ? "bg-primary" : "bg-light"
+                }`}
+                style={{
+                  width: 10,
+                  height: 10,
+                  opacity: index === currentIndex ? 1 : 0.6,
+                }}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </>
+  );
+};
+
+export default BannerSection;
