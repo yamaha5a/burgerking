@@ -1,3 +1,5 @@
+
+
 function Header() {
   return (
     <div className="container-fluid fixed-top">
@@ -6,11 +8,11 @@ function Header() {
           <div className="top-info ps-2">
             <small className="me-3">
               <i className="fas fa-map-marker-alt me-2 text-secondary"></i>
-              <a href="#" className="text-white">123 Street, New York</a>
+              <a href="#" className="text-white">43Tam Trinh, Hà Nội</a>
             </small>
             <small className="me-3">
               <i className="fas fa-envelope me-2 text-secondary"></i>
-              <a href="#" className="text-white">Email@Example.com</a>
+              <a href="#" className="text-white">Mihato@mihato.com</a>
             </small>
           </div>
 

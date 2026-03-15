@@ -1,4 +1,14 @@
+import { useNavigate } from "react-router-dom"
+import { useAuth } from "../../../context/AuthContext"
+
 export default function Sidebar() {
+  const { user, logout } = useAuth()
+  const navigate = useNavigate()
+
+  const handleLogout = () => {
+    logout()
+    navigate("/admin/login", { replace: true })
+  }
   return (
     <aside
       className="d-none d-md-flex flex-column bg-dark text-white p-3 border-end"
@@ -53,7 +63,12 @@ export default function Sidebar() {
       </nav>
 
       <div className="mt-4 pt-3 border-top border-secondary">
-        <button className="btn btn-outline-light btn-sm w-100 text-start">
+        <div className="small text-white-50 mb-2">{user?.username}</div>
+        <button
+          type="button"
+          className="btn btn-outline-light btn-sm w-100 text-start"
+          onClick={handleLogout}
+        >
           Đăng xuất
         </button>
       </div>
