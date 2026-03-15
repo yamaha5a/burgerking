@@ -10,6 +10,7 @@ import AdminProtectedRoute from "./component/admin/AdminProtectedRoute"
 import AdminLogin from "./component/admin/adminLogin/AdminLogin"
 import Content from "./component/admin/adminHome/content"
 import BannerAdmin from "./component/admin/component/bannerAdmin"
+import UserAdmin from "./component/admin/component/userAdmin"
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
       >
         <Route index element={<Content />} />
         <Route path="banners" element={<BannerAdmin />} />
+        <Route path="users" element={<UserAdmin />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
