@@ -40,11 +40,6 @@ export default function Sidebar() {
           </li>
           <li className="nav-item">
             <button className="nav-link text-start text-white-50 rounded-3">
-              Sản phẩm
-            </button>
-          </li>
-          <li className="nav-item">
-            <button className="nav-link text-start text-white-50 rounded-3">
               Khách hàng
             </button>
           </li>
@@ -66,6 +61,26 @@ export default function Sidebar() {
               onClick={() => navigate("/admin/users")}
             >
               Quản lý người dùng
+            </button>
+          </li>
+          <li className="nav-item">
+            <button
+              className={`nav-link text-start rounded-3 ${
+                isActive("/admin/categories") ? "bg-primary text-white" : "text-white-50"
+              }`}
+              onClick={() => navigate("/admin/categories")}
+            >
+              Quản lý danh mục
+            </button>
+          </li>
+          <li className="nav-item">
+            <button
+              className={`nav-link text-start rounded-3 ${
+                isActive("/admin/products") ? "bg-primary text-white" : "text-white-50"
+              }`}
+              onClick={() => navigate("/admin/products")}
+            >
+              Quản lý sản phẩm
             </button>
           </li>
           <li className="nav-item mt-3">

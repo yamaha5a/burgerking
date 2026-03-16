@@ -1,6 +1,42 @@
-import React from 'react'
+import { useEffect, useState } from "react";
 
-const product = () => {
+interface Product {
+  _id: string;
+  name: string;
+  category: string;
+  price: number;
+  image: string;
+  description?: string;
+  status?: string;
+}
+
+const formatMoney = (value: number) =>
+  new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(value);
+
+const ProductSection = () => {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadLatest = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await fetch("/api/products/public/latest?limit=8");
+      if (!res.ok) throw new Error("Failed");
+      const data = (await res.json()) as Product[];
+      setProducts(data);
+    } catch (e) {
+      setError("Không tải được sản phẩm mới nhất");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadLatest();
+  }, []);
+
   return (
     <>
       {/* Fruits Shop Start */}
@@ -88,49 +124,61 @@ const product = () => {
                   <div className="col-lg-12">
                     <div className="row g-4">
 
-                      <div className="col-md-6 col-lg-4 col-xl-3">
-                        <div className="rounded position-relative fruite-item">
-                          <div className="fruite-img">
-                            <img
-                              src="img/fruite-item-5.jpg"
-                              className="img-fluid w-100 rounded-top"
-                              alt=""
-                            />
-                          </div>
+                      {loading && products.length === 0 ? (
+                        <div className="text-center text-muted py-4">
+                          Đang tải sản phẩm...
+                        </div>
+                      ) : error ? (
+                        <div className="text-center text-danger py-4">{error}</div>
+                      ) : products.length === 0 ? (
+                        <div className="text-center text-muted py-4">
+                          Chưa có sản phẩm nào.
+                        </div>
+                      ) : (
+                        products.map((p) => (
+                          <div key={p._id} className="col-md-6 col-lg-4 col-xl-3">
+                            <div className="rounded position-relative fruite-item">
+                              <div className="fruite-img">
+                                <img
+                                  src={p.image}
+                                  className="img-fluid w-100 rounded-top"
+                                  alt={p.name}
+                                  style={{ height: 220, objectFit: "cover" }}
+                                />
+                              </div>
 
-                          <div
-                            className="text-white bg-secondary px-3 py-1 rounded position-absolute"
-                            style={{ top: "10px", left: "10px" }}
-                          >
-                            Fruits
-                          </div>
-
-                          <div className="p-4 border border-secondary border-top-0 rounded-bottom">
-                            <h4>Grapes</h4>
-                            <p>
-                              Lorem ipsum dolor sit amet consectetur adipisicing
-                              elit sed do eiusmod te incididunt
-                            </p>
-
-                            <div className="d-flex justify-content-between flex-lg-wrap">
-                              <p className="text-dark fs-5 fw-bold mb-0">
-                                $4.99 / kg
-                              </p>
-
-                              <a
-                                href="#"
-                                className="btn border border-secondary rounded-pill px-3 text-primary"
+                              <div
+                                className="text-white bg-secondary px-3 py-1 rounded position-absolute"
+                                style={{ top: "10px", left: "10px" }}
                               >
-                                <i className="fa fa-shopping-bag me-2 text-primary"></i>
-                                Add to cart
-                              </a>
+                                {p.category}
+                              </div>
+
+                              <div className="p-4 border border-secondary border-top-0 rounded-bottom">
+                                <h4 className="text-truncate">{p.name}</h4>
+                                <p className="text-muted" style={{ minHeight: 48 }}>
+                                  {p.description || "Sản phẩm mới nhất."}
+                                </p>
+
+                                <div className="d-flex justify-content-between flex-lg-wrap">
+                                  <p className="text-dark fs-5 fw-bold mb-0">
+                                    {formatMoney(p.price)}đ
+                                  </p>
+
+                                  <a
+                                    href="#"
+                                    className="btn border border-secondary rounded-pill px-3 text-primary"
+                                    onClick={(e) => e.preventDefault()}
+                                  >
+                                    <i className="fa fa-shopping-bag me-2 text-primary"></i>
+                                    Add to cart
+                                  </a>
+                                </div>
+                              </div>
                             </div>
                           </div>
-
-                        </div>
-                      </div>
-
-                      {/* Các item khác giữ nguyên như HTML bạn gửi */}
+                        ))
+                      )}
 
                     </div>
                   </div>
@@ -147,4 +195,4 @@ const product = () => {
   )
 }
 
-export default product
+export default ProductSection

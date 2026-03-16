@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../../context/AuthContext";
+import { useAdminNotification } from "../../hook/hook";
 
 interface Banner {
   _id: string;
@@ -12,6 +13,7 @@ interface Banner {
 
 const BannerAdmin = () => {
   const { token } = useAuth();
+  const { notify } = useAdminNotification();
   const [banners, setBanners] = useState<Banner[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -33,6 +35,7 @@ const BannerAdmin = () => {
       setBanners(data);
     } catch (err) {
       setError("Không tải được danh sách banner");
+      notify("error", "Không tải được danh sách banner");
     } finally {
       setLoading(false);
     }
@@ -82,8 +85,10 @@ const BannerAdmin = () => {
 
         await loadBanners();
         resetForm();
+        notify("success", editingBanner ? "Cập nhật banner thành công" : "Thêm banner thành công");
       } catch (err) {
         setError("Không lưu được banner, vui lòng thử lại");
+        notify("error", "Không lưu được banner");
       } finally {
         setLoading(false);
       }
@@ -109,8 +114,10 @@ const BannerAdmin = () => {
       });
       if (!res.ok) throw new Error("Failed to delete");
       await loadBanners();
+      notify("success", "Xóa banner thành công");
     } catch {
       setError("Không xóa được banner");
+      notify("error", "Không xóa được banner");
     } finally {
       setLoading(false);
     }
