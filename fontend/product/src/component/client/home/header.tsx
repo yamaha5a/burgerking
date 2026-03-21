@@ -1,6 +1,19 @@
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../../context/AuthContext";
 
 
 function Header() {
+  const { clientUser, clientLogout } = useAuth();
+  const [openUserMenu, setOpenUserMenu] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    clientLogout();
+    setOpenUserMenu(false);
+    navigate("/");
+  };
+
   return (
     <div className="container-fluid fixed-top">
       <div className="container topbar bg-primary d-none d-lg-block">
@@ -47,10 +60,8 @@ function Header() {
 
           <div className="collapse navbar-collapse bg-white" id="navbarCollapse">
             <div className="navbar-nav mx-auto">
-              <a href="index.html" className="nav-item nav-link active">Home</a>
-              <a href="shop.html" className="nav-item nav-link">Shop</a>
-              <a href="shop-detail.html" className="nav-item nav-link">Shop Detail</a>
-
+              <Link to="/" className="nav-item nav-link active">Home</Link>
+              <Link to="/sanpham" className="nav-item nav-link">Sản phẩm</Link>
               <div className="nav-item dropdown">
                 <a href="#" className="nav-link dropdown-toggle" data-bs-toggle="dropdown">
                   Pages
@@ -86,9 +97,91 @@ function Header() {
                 </span>
               </a>
 
-              <a href="#" className="my-auto">
-                <i className="fas fa-user fa-2x"></i>
-              </a>
+              <div className="my-auto position-relative">
+                <button
+                  type="button"
+                  className="btn p-0 border-0 bg-transparent"
+                  onClick={() => setOpenUserMenu((v) => !v)}
+                >
+                  {clientUser ? (
+                    clientUser.avatar ? (
+                      <img
+                        src={clientUser.avatar}
+                        alt={clientUser.username}
+                        style={{
+                          width: 36,
+                          height: 36,
+                          borderRadius: "50%",
+                          objectFit: "cover",
+                        }}
+                      />
+                    ) : (
+                      <span
+                        className="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-circle"
+                        style={{ width: 36, height: 36, fontWeight: 700 }}
+                      >
+                        {clientUser.username?.charAt(0)?.toUpperCase() || "U"}
+                      </span>
+                    )
+                  ) : (
+                    <i className="fas fa-user fa-2x"></i>
+                  )}
+                </button>
+
+                {openUserMenu && (
+                  <div
+                    className="bg-white border rounded shadow-sm p-2"
+                    style={{ position: "absolute", right: 0, top: 42, minWidth: 200, zIndex: 1050 }}
+                  >
+                    {!clientUser ? (
+                      <>
+                        <Link
+                          to="/dang-nhap"
+                          className="dropdown-item rounded"
+                          onClick={() => setOpenUserMenu(false)}
+                        >
+                          Đăng nhập
+                        </Link>
+                        <Link
+                          to="/dang-ky"
+                          className="dropdown-item rounded"
+                          onClick={() => setOpenUserMenu(false)}
+                        >
+                          Đăng ký
+                        </Link>
+                        <Link
+                          to="/admin/login"
+                          className="dropdown-item rounded"
+                          onClick={() => setOpenUserMenu(false)}
+                        >
+                          Đăng nhập admin
+                        </Link>
+                      </>
+                    ) : (
+                      <>
+                        <div className="px-3 py-2 border-bottom">
+                          <div className="fw-semibold">{clientUser.username}</div>
+                          <div className="small text-muted">{clientUser.email}</div>
+                        </div>
+                        <button
+                          type="button"
+                          className="dropdown-item rounded mt-1"
+                          onClick={() => setOpenUserMenu(false)}
+                        >
+                          Thông tin tài khoản
+                        </button>
+                        <button
+                          type="button"
+                          className="dropdown-item rounded text-danger"
+                          onClick={handleLogout}
+                        >
+                          Đăng xuất
+                        </button>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </nav>

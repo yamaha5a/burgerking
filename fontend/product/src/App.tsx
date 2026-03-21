@@ -13,6 +13,10 @@ import BannerAdmin from "./component/admin/component/bannerAdmin"
 import UserAdmin from "./component/admin/component/userAdmin"
 import ProductAdmin from "./component/admin/component/productAdmin"
 import CategoryAdmin from "./component/admin/component/categoryAdmin"
+import Sanpham from "./component/client/home/sanpham/sanpham"
+import DetailSanpham from "./component/client/home/sanpham/detailsanpham"
+import DangNhap from "./component/client/home/nguoidung/dangnhap"
+import DangKy from "./component/client/home/nguoidung/dangky"
 
 function App() {
   return (
@@ -21,6 +25,10 @@ function App() {
       {/* CLIENT */}
       <Route path="/" element={<LayoutClient />}>
         <Route index element={<Home />} />
+        <Route path="sanpham" element={<Sanpham />} />
+        <Route path="sanpham/:id" element={<DetailSanpham />} />
+        <Route path="dang-nhap" element={<DangNhap />} />
+        <Route path="dang-ky" element={<DangKy />} />
       </Route>
 
       {/* ADMIN - Đăng nhập */}

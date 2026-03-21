@@ -6,7 +6,9 @@ const upload = require("../middleware/upload");
 const router = express.Router();
 
 // Public: sản phẩm mới nhất (client)
+router.get("/public", productController.getPublicProducts);
 router.get("/public/latest", productController.getLatestPublicProducts);
+router.get("/public/:id", productController.getPublicProductById);
 
 // Chỉ admin mới được quản lý sản phẩm
 router.get("/", requireAuth, requireAdmin, productController.getProducts);

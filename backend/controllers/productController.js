@@ -1,6 +1,62 @@
 const Product = require("../models/productModel");
 const cloudinary = require("../config/cloudinary");
 
+// GET /api/products/public/:id
+const getPublicProductById = async (req, res) => {
+  try {
+    const product = await Product.findOne({
+      _id: req.params.id,
+      status: { $ne: "inactive" },
+    });
+    if (!product) return res.status(404).json({ message: "Không tìm thấy sản phẩm" });
+    res.json(product);
+  } catch (err) {
+    console.error("Error fetching public product detail:", err);
+    res.status(500).json({ message: "Lỗi server khi lấy chi tiết sản phẩm" });
+  }
+};
+
+// GET /api/products/public
+// Query: page, limit, search, category, sort (newest|oldest|price_asc|price_desc)
+const getPublicProducts = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 9;
+    const skip = (page - 1) * limit;
+    const { search = "", category = "", sort = "newest" } = req.query;
+
+    const filter = { status: { $ne: "inactive" } };
+    if (search) {
+      const regex = new RegExp(String(search), "i");
+      filter.$or = [{ name: regex }, { category: regex }, { origin: regex }];
+    }
+    if (category) {
+      filter.category = String(category);
+    }
+
+    let sortOption = { createdAt: -1 };
+    if (sort === "oldest") sortOption = { createdAt: 1 };
+    if (sort === "price_asc") sortOption = { price: 1, createdAt: -1 };
+    if (sort === "price_desc") sortOption = { price: -1, createdAt: -1 };
+
+    const [total, products] = await Promise.all([
+      Product.countDocuments(filter),
+      Product.find(filter).sort(sortOption).skip(skip).limit(limit),
+    ]);
+
+    res.json({
+      data: products,
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    });
+  } catch (err) {
+    console.error("Error fetching public products:", err);
+    res.status(500).json({ message: "Lỗi server khi lấy danh sách sản phẩm" });
+  }
+};
+
 // GET /api/products/public/latest
 // Query: limit (default 8)
 const getLatestPublicProducts = async (req, res) => {
@@ -161,6 +217,8 @@ const deleteProduct = async (req, res) => {
 };
 
 module.exports = {
+  getPublicProductById,
+  getPublicProducts,
   getLatestPublicProducts,
   getProducts,
   getProductById,

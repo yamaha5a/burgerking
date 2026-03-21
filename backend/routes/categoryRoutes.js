@@ -4,6 +4,9 @@ const categoryController = require("../controllers/categoryController");
 
 const router = express.Router();
 
+// Public: danh mục hiển thị ở client
+router.get("/public", categoryController.getPublicCategories);
+
 // Chỉ admin mới được quản lý danh mục
 router.get("/", requireAuth, requireAdmin, categoryController.getCategories);
 router.get("/:id", requireAuth, requireAdmin, categoryController.getCategoryById);

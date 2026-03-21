@@ -1,4 +1,41 @@
 const Category = require("../models/categoryModel");
+const Product = require("../models/productModel");
+
+// GET /api/categories/public
+// Trả danh mục active + số lượng sản phẩm đang hiển thị
+const getPublicCategories = async (req, res) => {
+  try {
+    const categories = await Category.find({ status: "active" }).sort({ name: 1 }).lean();
+    const names = categories.map((c) => c.name);
+
+    let countMap = {};
+    if (names.length > 0) {
+      const counts = await Product.aggregate([
+        {
+          $match: {
+            status: { $ne: "inactive" },
+            category: { $in: names },
+          },
+        },
+        { $group: { _id: "$category", total: { $sum: 1 } } },
+      ]);
+      countMap = counts.reduce((acc, item) => {
+        acc[item._id] = item.total;
+        return acc;
+      }, {});
+    }
+
+    const data = categories.map((c) => ({
+      ...c,
+      productCount: countMap[c.name] || 0,
+    }));
+
+    res.json(data);
+  } catch (err) {
+    console.error("Error fetching public categories:", err);
+    res.status(500).json({ message: "Lỗi server khi lấy danh mục hiển thị" });
+  }
+};
 
 // GET /api/categories
 // Query: page, limit, search, sort (newest|oldest)
@@ -98,6 +135,7 @@ const deleteCategory = async (req, res) => {
 };
 
 module.exports = {
+  getPublicCategories,
   getCategories,
   getCategoryById,
   createCategory,

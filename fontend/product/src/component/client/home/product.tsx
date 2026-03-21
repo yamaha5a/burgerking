@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 interface Product {
   _id: string;
@@ -139,12 +140,14 @@ const ProductSection = () => {
                           <div key={p._id} className="col-md-6 col-lg-4 col-xl-3">
                             <div className="rounded position-relative fruite-item">
                               <div className="fruite-img">
-                                <img
-                                  src={p.image}
-                                  className="img-fluid w-100 rounded-top"
-                                  alt={p.name}
-                                  style={{ height: 220, objectFit: "cover" }}
-                                />
+                                <Link to={`/sanpham/${p._id}`}>
+                                  <img
+                                    src={p.image}
+                                    className="img-fluid w-100 rounded-top"
+                                    alt={p.name}
+                                    style={{ height: 220, objectFit: "cover" }}
+                                  />
+                                </Link>
                               </div>
 
                               <div
@@ -155,7 +158,11 @@ const ProductSection = () => {
                               </div>
 
                               <div className="p-4 border border-secondary border-top-0 rounded-bottom">
-                                <h4 className="text-truncate">{p.name}</h4>
+                                <h4 className="text-truncate">
+                                  <Link to={`/sanpham/${p._id}`} className="text-dark text-decoration-none">
+                                    {p.name}
+                                  </Link>
+                                </h4>
                                 <p className="text-muted" style={{ minHeight: 48 }}>
                                   {p.description || "Sản phẩm mới nhất."}
                                 </p>
