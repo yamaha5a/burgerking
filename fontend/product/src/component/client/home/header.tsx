@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
+import { useCart } from "../../../context/CartContext";
 
 
 function Header() {
   const { clientUser, clientLogout } = useAuth();
+  const { totalQuantity } = useCart();
   const [openUserMenu, setOpenUserMenu] = useState(false);
   const navigate = useNavigate();
 
@@ -46,7 +48,7 @@ function Header() {
       <div className="container px-0">
         <nav className="navbar navbar-light bg-white navbar-expand-xl">
           <a href="index.html" className="navbar-brand">
-            <h1 className="text-primary display-6">Fruitables</h1>
+            <h1 className="text-primary display-6">Burger King</h1>
           </a>
 
           <button
@@ -62,19 +64,6 @@ function Header() {
             <div className="navbar-nav mx-auto">
               <Link to="/" className="nav-item nav-link active">Home</Link>
               <Link to="/sanpham" className="nav-item nav-link">Sản phẩm</Link>
-              <div className="nav-item dropdown">
-                <a href="#" className="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                  Pages
-                </a>
-
-                <div className="dropdown-menu m-0 bg-secondary rounded-0">
-                  <a href="cart.html" className="dropdown-item">Cart</a>
-                  <a href="chackout.html" className="dropdown-item">Chackout</a>
-                  <a href="testimonial.html" className="dropdown-item">Testimonial</a>
-                  <a href="404.html" className="dropdown-item">404 Page</a>
-                </div>
-              </div>
-
               <a href="contact.html" className="nav-item nav-link">Contact</a>
             </div>
 
@@ -87,15 +76,15 @@ function Header() {
                 <i className="fas fa-search text-primary"></i>
               </button>
 
-              <a href="#" className="position-relative me-4 my-auto">
+              <Link to="/gio-hang" className="position-relative me-4 my-auto">
                 <i className="fa fa-shopping-bag fa-2x"></i>
                 <span
                   className="position-absolute bg-secondary rounded-circle d-flex align-items-center justify-content-center text-dark px-1"
                   style={{ top: "-5px", left: "15px", height: "20px", minWidth: "20px" }}
                 >
-                  3
+                  {totalQuantity}
                 </span>
-              </a>
+              </Link>
 
               <div className="my-auto position-relative">
                 <button
@@ -163,13 +152,13 @@ function Header() {
                           <div className="fw-semibold">{clientUser.username}</div>
                           <div className="small text-muted">{clientUser.email}</div>
                         </div>
-                        <button
-                          type="button"
+                        <Link
+                          to="/thong-tin-ca-nhan"
                           className="dropdown-item rounded mt-1"
                           onClick={() => setOpenUserMenu(false)}
                         >
                           Thông tin tài khoản
-                        </button>
+                        </Link>
                         <button
                           type="button"
                           className="dropdown-item rounded text-danger"

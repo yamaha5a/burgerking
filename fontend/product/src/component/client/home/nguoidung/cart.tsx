@@ -1,145 +1,124 @@
-import React from 'react'
+import { Link } from "react-router-dom";
+import { useAuth } from "../../../../context/AuthContext";
+import { useCart } from "../../../../context/CartContext";
 
-const cart = () => {
+const formatMoney = (value: number) =>
+  new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(value);
+
+const Cart = () => {
+  const { clientUser } = useAuth();
+  const { items, subtotal, total, loading, updateQuantity, removeItem } = useCart();
+
+  const handleDecrease = async (productId: string, quantity: number) => {
+    await updateQuantity(productId, quantity - 1);
+  };
+
+  const handleIncrease = async (productId: string, quantity: number) => {
+    await updateQuantity(productId, quantity + 1);
+  };
+
   return (
     <>
     <div className="container-fluid page-header py-5">
   <h1 className="text-center text-white display-6">Cart</h1>
   <ol className="breadcrumb justify-content-center mb-0">
     <li className="breadcrumb-item">
-      <a href="#">Home</a>
+      <Link to="/">Home</Link>
     </li>
     <li className="breadcrumb-item">
-      <a href="#">Pages</a>
+      <Link to="/sanpham">Shop</Link>
     </li>
     <li className="breadcrumb-item active text-white">Cart</li>
   </ol>
 </div>
 <div className="container-fluid py-5">
   <div className="container py-5">
+    {!clientUser ? (
+      <div className="text-center text-muted py-5">
+        Vui lòng đăng nhập để xem giỏ hàng.
+      </div>
+    ) : loading ? (
+      <div className="text-center text-muted py-5">Đang tải giỏ hàng...</div>
+    ) : (
+      <>
     <div className="table-responsive">
       <table className="table">
         <thead>
           <tr>
-            <th scope="col">Products</th>
-            <th scope="col">Name</th>
-            <th scope="col">Price</th>
-            <th scope="col">Quantity</th>
-            <th scope="col">Total</th>
-            <th scope="col">Handle</th>
+            <th scope="col">Hình Ảnh</th>
+            <th scope="col">Tên Sản Phẩm</th>
+            <th scope="col">Giá Sản Phẩm</th>
+            <th scope="col">Số Lượng</th>
+            <th scope="col">Tổng Tiền</th>
+            <th scope="col">Xóa sản phẩm</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <th scope="row">
-              <div className="d-flex align-items-center">
-                <img src="img/vegetable-item-3.png" className="img-fluid me-5 rounded-circle" style={{ width: "80px", height: "80px" }} alt="" />
-              </div>
-            </th>
-            <td>
-              <p className="mb-0 mt-4">Big Banana</p>
-            </td>
-            <td>
-              <p className="mb-0 mt-4">2.99 $</p>
-            </td>
-            <td>
-              <div className="input-group quantity mt-4" style={{ width: "100px" }}>
-                <div className="input-group-btn">
-                  <button className="btn btn-sm btn-minus rounded-circle bg-light border">
-                    <i className="fa fa-minus"></i>
+          {items.length === 0 ? (
+            <tr>
+              <td colSpan={6} className="text-center text-muted py-4">
+                Giỏ hàng của bạn đang trống.
+              </td>
+            </tr>
+          ) : (
+            items.map((item) => (
+              <tr key={item.productId}>
+                <th scope="row">
+                  <div className="d-flex align-items-center">
+                    <img
+                      src={item.image}
+                      className="img-fluid me-5 rounded-circle"
+                      style={{ width: "80px", height: "80px", objectFit: "cover" }}
+                      alt={item.name}
+                    />
+                  </div>
+                </th>
+                <td>
+                  <p className="mb-0 mt-4">{item.name}</p>
+                </td>
+                <td>
+                  <p className="mb-0 mt-4">{formatMoney(item.price)}đ</p>
+                </td>
+                <td>
+                  <div className="input-group quantity mt-4" style={{ width: "100px" }}>
+                    <div className="input-group-btn">
+                      <button
+                        className="btn btn-sm btn-minus rounded-circle bg-light border"
+                        onClick={() => handleDecrease(item.productId, item.quantity)}
+                      >
+                        <i className="fa fa-minus"></i>
+                      </button>
+                    </div>
+                    <input
+                      type="text"
+                      className="form-control form-control-sm text-center border-0"
+                      value={item.quantity}
+                      readOnly
+                    />
+                    <div className="input-group-btn">
+                      <button
+                        className="btn btn-sm btn-plus rounded-circle bg-light border"
+                        onClick={() => handleIncrease(item.productId, item.quantity)}
+                      >
+                        <i className="fa fa-plus"></i>
+                      </button>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <p className="mb-0 mt-4">{formatMoney(item.total)}đ</p>
+                </td>
+                <td>
+                  <button
+                    className="btn btn-md rounded-circle bg-light border mt-4"
+                    onClick={() => removeItem(item.productId)}
+                  >
+                    <i className="fa fa-times text-danger"></i>
                   </button>
-                </div>
-                <input type="text" className="form-control form-control-sm text-center border-0" defaultValue="1" />
-                <div className="input-group-btn">
-                  <button className="btn btn-sm btn-plus rounded-circle bg-light border">
-                    <i className="fa fa-plus"></i>
-                  </button>
-                </div>
-              </div>
-            </td>
-            <td>
-              <p className="mb-0 mt-4">2.99 $</p>
-            </td>
-            <td>
-              <button className="btn btn-md rounded-circle bg-light border mt-4">
-                <i className="fa fa-times text-danger"></i>
-              </button>
-            </td>
-          </tr>
-
-          <tr>
-            <th scope="row">
-              <div className="d-flex align-items-center">
-                <img src="img/vegetable-item-5.jpg" className="img-fluid me-5 rounded-circle" style={{ width: "80px", height: "80px" }} alt="" />
-              </div>
-            </th>
-            <td>
-              <p className="mb-0 mt-4">Potatoes</p>
-            </td>
-            <td>
-              <p className="mb-0 mt-4">2.99 $</p>
-            </td>
-            <td>
-              <div className="input-group quantity mt-4" style={{ width: "100px" }}>
-                <div className="input-group-btn">
-                  <button className="btn btn-sm btn-minus rounded-circle bg-light border">
-                    <i className="fa fa-minus"></i>
-                  </button>
-                </div>
-                <input type="text" className="form-control form-control-sm text-center border-0" defaultValue="1" />
-                <div className="input-group-btn">
-                  <button className="btn btn-sm btn-plus rounded-circle bg-light border">
-                    <i className="fa fa-plus"></i>
-                  </button>
-                </div>
-              </div>
-            </td>
-            <td>
-              <p className="mb-0 mt-4">2.99 $</p>
-            </td>
-            <td>
-              <button className="btn btn-md rounded-circle bg-light border mt-4">
-                <i className="fa fa-times text-danger"></i>
-              </button>
-            </td>
-          </tr>
-
-          <tr>
-            <th scope="row">
-              <div className="d-flex align-items-center">
-                <img src="img/vegetable-item-2.jpg" className="img-fluid me-5 rounded-circle" style={{ width: "80px", height: "80px" }} alt="" />
-              </div>
-            </th>
-            <td>
-              <p className="mb-0 mt-4">Awesome Brocoli</p>
-            </td>
-            <td>
-              <p className="mb-0 mt-4">2.99 $</p>
-            </td>
-            <td>
-              <div className="input-group quantity mt-4" style={{ width: "100px" }}>
-                <div className="input-group-btn">
-                  <button className="btn btn-sm btn-minus rounded-circle bg-light border">
-                    <i className="fa fa-minus"></i>
-                  </button>
-                </div>
-                <input type="text" className="form-control form-control-sm text-center border-0" defaultValue="1" />
-                <div className="input-group-btn">
-                  <button className="btn btn-sm btn-plus rounded-circle bg-light border">
-                    <i className="fa fa-plus"></i>
-                  </button>
-                </div>
-              </div>
-            </td>
-            <td>
-              <p className="mb-0 mt-4">2.99 $</p>
-            </td>
-            <td>
-              <button className="btn btn-md rounded-circle bg-light border mt-4">
-                <i className="fa fa-times text-danger"></i>
-              </button>
-            </td>
-          </tr>
+                </td>
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
     </div>
@@ -157,29 +136,45 @@ const cart = () => {
         <div className="bg-light rounded">
           <div className="p-4">
             <h1 className="display-6 mb-4">
-              Cart <span className="fw-normal">Total</span>
+              Tổng <span className="fw-normal">Giỏ Hàng</span>
             </h1>
             <div className="d-flex justify-content-between mb-4">
               <h5 className="mb-0 me-4">Subtotal:</h5>
-              <p className="mb-0">$96.00</p>
+              <p className="mb-0">{formatMoney(subtotal)}đ</p>
             </div>
           </div>
 
           <div className="py-4 mb-4 border-top border-bottom d-flex justify-content-between">
-            <h5 className="mb-0 ps-4 me-4">Total</h5>
-            <p className="mb-0 pe-4">$99.00</p>
+            <h5 className="mb-0 ps-4 me-4">Tổng</h5>
+            <p className="mb-0 pe-4">{formatMoney(total)}đ</p>
           </div>
 
-          <button className="btn border-secondary rounded-pill px-4 py-3 text-primary text-uppercase mb-4 ms-4" type="button">
-            Proceed Checkout
-          </button>
+          {items.length === 0 ? (
+            <button
+              className="btn border-secondary rounded-pill px-4 py-3 text-primary text-uppercase mb-4 ms-4"
+              type="button"
+              disabled
+            >
+              Proceed Checkout
+            </button>
+          ) : (
+            <Link
+              to="/don-hang"
+              className="btn border-secondary rounded-pill px-4 py-3 text-primary text-uppercase mb-4 ms-4"
+            >
+              Tiến hành thanh toán
+
+            </Link>
+          )}
         </div>
       </div>
     </div>
+    </>
+    )}
   </div>
 </div>
     </>
   )
 }
 
-export default cart
+export default Cart

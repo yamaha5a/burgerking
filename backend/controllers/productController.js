@@ -1,4 +1,5 @@
 const Product = require("../models/productModel");
+const Bill = require("../models/billModel");
 const cloudinary = require("../config/cloudinary");
 
 // GET /api/products/public/:id
@@ -207,6 +208,15 @@ const updateProduct = async (req, res) => {
 // DELETE /api/products/:id
 const deleteProduct = async (req, res) => {
   try {
+    const ordered = await Bill.exists({
+      "danh_sach_san_pham.productId": req.params.id,
+    });
+    if (ordered) {
+      return res
+        .status(400)
+        .json({ message: "Không thể xóa sản phẩm đã phát sinh trong đơn hàng" });
+    }
+
     const deleted = await Product.findByIdAndDelete(req.params.id);
     if (!deleted) return res.status(404).json({ message: "Không tìm thấy sản phẩm" });
     res.json({ message: "Đã xóa sản phẩm" });

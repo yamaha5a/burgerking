@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { useCart } from "../../../../context/CartContext";
 
 interface ProductDetail {
   _id: string;
@@ -19,6 +20,7 @@ const formatMoney = (value: number) =>
 
 const DetailSanpham = () => {
   const { id } = useParams();
+  const { addToCart } = useCart();
   const [product, setProduct] = useState<ProductDetail | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -43,6 +45,14 @@ const DetailSanpham = () => {
     fetchDetail();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
+
+  const handleAddToCart = async () => {
+    if (!product) return;
+    const result = await addToCart(product._id, 1);
+    if (!result.success && result.message) {
+      window.alert(result.message);
+    }
+  };
 
   return (
 <>
@@ -86,6 +96,14 @@ const DetailSanpham = () => {
                         >
                           Quay lại danh sách
                         </Link>
+                        <button
+                          type="button"
+                          className="btn border border-secondary rounded-pill px-4 py-2 mb-4 text-primary ms-2"
+                          onClick={handleAddToCart}
+                        >
+                          <i className="fa fa-shopping-bag me-2 text-primary"></i>
+                          Add to cart
+                        </button>
                     </div>
                 </div>
             </div>

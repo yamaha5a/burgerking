@@ -34,7 +34,12 @@ export default function Sidebar() {
             </button>
           </li>
           <li className="nav-item">
-            <button className="nav-link text-start text-white-50 rounded-3">
+            <button
+              className={`nav-link text-start rounded-3 ${
+                isActive("/admin/bills") ? "bg-primary text-white" : "text-white-50"
+              }`}
+              onClick={() => navigate("/admin/bills")}
+            >
               Đơn hàng
             </button>
           </li>

@@ -1,5 +1,6 @@
 const Category = require("../models/categoryModel");
 const Product = require("../models/productModel");
+const Bill = require("../models/billModel");
 
 // GET /api/categories/public
 // Trả danh mục active + số lượng sản phẩm đang hiển thị
@@ -125,6 +126,18 @@ const updateCategory = async (req, res) => {
 // DELETE /api/categories/:id
 const deleteCategory = async (req, res) => {
   try {
+    const category = await Category.findById(req.params.id);
+    if (!category) return res.status(404).json({ message: "Không tìm thấy danh mục" });
+
+    const hasOrderedByCategoryName = await Bill.exists({
+      "danh_sach_san_pham.category": category.name,
+    });
+    if (hasOrderedByCategoryName) {
+      return res
+        .status(400)
+        .json({ message: "Không thể xóa danh mục đã phát sinh trong đơn hàng" });
+    }
+
     const deleted = await Category.findByIdAndDelete(req.params.id);
     if (!deleted) return res.status(404).json({ message: "Không tìm thấy danh mục" });
     res.json({ message: "Đã xóa danh mục" });

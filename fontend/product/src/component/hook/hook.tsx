@@ -86,3 +86,6 @@ export const useAdminNotification = () => {
   return ctx;
 };
 
+export const NotificationProvider = AdminNotificationProvider;
+export const useNotification = useAdminNotification;
+

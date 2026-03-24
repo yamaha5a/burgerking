@@ -28,6 +28,7 @@ interface AuthContextType {
     password: string
   ) => Promise<{ success: boolean; message?: string }>;
   clientLogout: () => void;
+  setClientProfile: (user: User) => void;
 
   loading: boolean;
 }
@@ -186,6 +187,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem(CLIENT_TOKEN_KEY);
   };
 
+  const setClientProfile = (nextUser: User) => {
+    setClientUser(nextUser);
+    localStorage.setItem(CLIENT_AUTH_KEY, JSON.stringify(nextUser));
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -199,6 +205,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         clientLogin,
         clientRegister,
         clientLogout,
+        setClientProfile,
         loading,
       }}
     >

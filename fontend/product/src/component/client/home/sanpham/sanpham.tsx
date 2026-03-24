@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useCart } from "../../../../context/CartContext";
 
 interface Product {
   _id: string;
@@ -28,6 +29,7 @@ const formatMoney = (value: number) =>
   new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(value);
 
 const Sanpham = () => {
+  const { addToCart } = useCart();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<CategoryItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -92,6 +94,13 @@ const Sanpham = () => {
 
   const canPrev = page > 1;
   const canNext = page < totalPages;
+
+  const handleAddToCart = async (productId: string) => {
+    const result = await addToCart(productId, 1);
+    if (!result.success && result.message) {
+      window.alert(result.message);
+    }
+  };
 
   return (
     <>
@@ -252,14 +261,14 @@ const Sanpham = () => {
                         <div className="d-flex justify-content-between flex-lg-wrap">
                           <p className="text-dark fs-5 fw-bold mb-0">{formatMoney(p.price)}đ</p>
 
-                          <a
-                            href="#"
+                          <button
+                            type="button"
                             className="btn border border-secondary rounded-pill px-3 text-primary"
-                            onClick={(e) => e.preventDefault()}
+                            onClick={() => handleAddToCart(p._id)}
                           >
                             <i className="fa fa-shopping-bag me-2 text-primary"></i>
                             Add to cart
-                          </a>
+                          </button>
                         </div>
                       </div>
                     </div>
