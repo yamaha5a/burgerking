@@ -36,6 +36,16 @@ export default function Sidebar() {
           <li className="nav-item">
             <button
               className={`nav-link text-start rounded-3 ${
+                isActive("/admin/reviews") ? "bg-primary text-white" : "text-white-50"
+              }`}
+              onClick={() => navigate("/admin/reviews")}
+            >
+              Quản lý bình luận
+            </button>
+          </li>
+          <li className="nav-item">
+            <button
+              className={`nav-link text-start rounded-3 ${
                 isActive("/admin/bills") ? "bg-primary text-white" : "text-white-50"
               }`}
               onClick={() => navigate("/admin/bills")}

@@ -45,6 +45,12 @@ interface Bill {
 
 type BillFilterStatus = "all" | Bill["trang_thai"];
 
+type ReviewModalState = {
+  billId: string;
+  productId: string;
+  productName: string;
+} | null;
+
 const statuses: Bill["trang_thai"][] = [
   "chờ thanh toán",
   "chờ vận chuyển",
@@ -104,6 +110,11 @@ const InfoUser = () => {
   const [returnReason, setReturnReason] = useState("");
   const [returnImageFile, setReturnImageFile] = useState<File | null>(null);
   const [submittingReturn, setSubmittingReturn] = useState(false);
+
+  const [reviewModal, setReviewModal] = useState<ReviewModalState>(null);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewContent, setReviewContent] = useState("");
+  const [submittingReview, setSubmittingReview] = useState(false);
 
   const fetchProfile = async () => {
     if (!clientToken) return;
@@ -340,6 +351,42 @@ const InfoUser = () => {
       notify("error", "Không thể kết nối máy chủ");
     } finally {
       setSubmittingReturn(false);
+    }
+  };
+
+  const submitReview = async () => {
+    if (!clientToken || !reviewModal) return;
+    if (!reviewContent.trim()) {
+      notify("error", "Vui lòng nhập nội dung đánh giá");
+      return;
+    }
+    try {
+      setSubmittingReview(true);
+      const res = await fetch("/api/reviews", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${clientToken}`,
+        },
+        body: JSON.stringify({
+          productId: reviewModal.productId,
+          rating: reviewRating,
+          content: reviewContent.trim(),
+        }),
+      });
+      const data = (await res.json()) as { message?: string };
+      if (!res.ok) {
+        notify("error", data.message || "Đánh giá thất bại");
+        return;
+      }
+      notify("success", data.message || "Đánh giá thành công");
+      setReviewModal(null);
+      setReviewRating(5);
+      setReviewContent("");
+    } catch {
+      notify("error", "Không thể kết nối máy chủ");
+    } finally {
+      setSubmittingReview(false);
     }
   };
 
@@ -778,6 +825,23 @@ const InfoUser = () => {
                   </div>
                   <div className="text-end ms-auto">
                     <div className="fw-semibold mb-2">{formatMoney(item.total)}đ</div>
+                    {detailBill.trang_thai === "cần đánh giá" && item.productId ? (
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-primary me-2"
+                        onClick={() => {
+                          setReviewModal({
+                            billId: detailBill._id,
+                            productId: String(item.productId),
+                            productName: item.name,
+                          });
+                          setReviewRating(5);
+                          setReviewContent("");
+                        }}
+                      >
+                        Đánh giá
+                      </button>
+                    ) : null}
                     {detailBill.trang_thai === "cần đánh giá" &&
                     item.productId &&
                     !item.hoan_hang?.ngay_gui ? (
@@ -802,6 +866,66 @@ const InfoUser = () => {
                 <strong>Tổng cộng</strong>
                 <strong>{formatMoney(detailBill.tong_tien)}đ</strong>
               </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
+      {reviewModal ? (
+        <div
+          className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center p-3"
+          style={{ background: "rgba(0, 0, 0, 0.5)", zIndex: 1075 }}
+        >
+          <div className="bg-white rounded shadow p-4 w-100" style={{ maxWidth: 520 }}>
+            <div className="d-flex justify-content-between align-items-start mb-2">
+              <div>
+                <h5 className="mb-1">Đánh giá sản phẩm</h5>
+                <div className="small text-muted">
+                  <strong>{reviewModal.productName}</strong>
+                </div>
+              </div>
+              <button type="button" className="btn btn-outline-secondary btn-sm" onClick={() => setReviewModal(null)}>
+                Đóng
+              </button>
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label">Số sao</label>
+              <div className="d-flex gap-2 flex-wrap">
+                {Array.from({ length: 5 }).map((_, i) => {
+                  const val = i + 1;
+                  const active = val <= reviewRating;
+                  return (
+                    <button
+                      key={val}
+                      type="button"
+                      className={`btn btn-sm ${active ? "btn-warning" : "btn-outline-warning"}`}
+                      onClick={() => setReviewRating(val)}
+                    >
+                      {val} <i className="fa fa-star"></i>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label">Nội dung</label>
+              <textarea
+                className="form-control"
+                rows={4}
+                placeholder="Nhập nội dung đánh giá..."
+                value={reviewContent}
+                onChange={(e) => setReviewContent(e.target.value)}
+              />
+            </div>
+
+            <div className="d-flex justify-content-end gap-2">
+              <button type="button" className="btn btn-outline-secondary" onClick={() => setReviewModal(null)}>
+                Hủy
+              </button>
+              <button type="button" className="btn btn-success" disabled={submittingReview} onClick={submitReview}>
+                {submittingReview ? "Đang gửi..." : "Submit"}
+              </button>
             </div>
           </div>
         </div>

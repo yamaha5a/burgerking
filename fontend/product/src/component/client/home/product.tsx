@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useCart } from "../../../context/CartContext";
+import CenteredToast from "./CenteredToast";
 
 interface Product {
   _id: string;
@@ -15,9 +17,15 @@ const formatMoney = (value: number) =>
   new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(value);
 
 const ProductSection = () => {
+  const { addToCart } = useCart();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ show: boolean; message: string; variant?: "success" | "danger" }>({
+    show: false,
+    message: "",
+    variant: "success",
+  });
 
   const loadLatest = async () => {
     try {
@@ -38,8 +46,23 @@ const ProductSection = () => {
     loadLatest();
   }, []);
 
+  const handleAddToCart = async (productId: string) => {
+    const result = await addToCart(productId, 1);
+    if (result.success) {
+      setToast({ show: true, message: "Thêm giỏ hàng thành công", variant: "success" });
+    } else {
+      setToast({ show: true, message: result.message || "Không thể thêm vào giỏ hàng", variant: "danger" });
+    }
+  };
+
   return (
     <>
+      <CenteredToast
+        show={toast.show}
+        message={toast.message}
+        variant={toast.variant}
+        onClose={() => setToast((t) => ({ ...t, show: false }))}
+      />
       {/* Fruits Shop Start */}
       <div className="container-fluid fruite py-5">
         <div className="container py-5">
@@ -123,14 +146,14 @@ const ProductSection = () => {
                                     {formatMoney(p.price)}đ
                                   </p>
 
-                                  <a
-                                    href="#"
+                                  <button
+                                    type="button"
                                     className="btn border border-secondary rounded-pill px-3 text-primary"
-                                    onClick={(e) => e.preventDefault()}
+                                    onClick={() => handleAddToCart(p._id)}
                                   >
                                     <i className="fa fa-shopping-bag me-2 text-primary"></i>
                                     Add to cart
-                                  </a>
+                                  </button>
                                 </div>
                               </div>
                             </div>

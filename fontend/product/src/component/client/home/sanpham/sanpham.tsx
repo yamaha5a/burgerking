@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "../../../../context/CartContext";
+import CenteredToast from "../CenteredToast";
 
 interface Product {
   _id: string;
@@ -30,6 +31,11 @@ const formatMoney = (value: number) =>
 
 const Sanpham = () => {
   const { addToCart } = useCart();
+  const [toast, setToast] = useState<{ show: boolean; message: string; variant?: "success" | "danger" }>( {
+    show: false,
+    message: "",
+    variant: "success",
+  });
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<CategoryItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -97,13 +103,21 @@ const Sanpham = () => {
 
   const handleAddToCart = async (productId: string) => {
     const result = await addToCart(productId, 1);
-    if (!result.success && result.message) {
-      window.alert(result.message);
+    if (result.success) {
+      setToast({ show: true, message: "Thêm giỏ hàng thành công", variant: "success" });
+      return;
     }
+    setToast({ show: true, message: result.message || "Không thể thêm vào giỏ hàng", variant: "danger" });
   };
 
   return (
     <>
+    <CenteredToast
+      show={toast.show}
+      message={toast.message}
+      variant={toast.variant}
+      onClose={() => setToast((t) => ({ ...t, show: false }))}
+    />
     <div className="container-fluid page-header py-5">
   <h1 className="text-center text-white display-6">Shop</h1>
   <ol className="breadcrumb justify-content-center mb-0">

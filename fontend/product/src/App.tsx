@@ -14,6 +14,7 @@ import UserAdmin from "./component/admin/component/userAdmin"
 import ProductAdmin from "./component/admin/component/productAdmin"
 import CategoryAdmin from "./component/admin/component/categoryAdmin"
 import BillAdmin from "./component/admin/component/billAdmin"
+import ReviewAdmin from "./component/admin/component/reviewAdmin"
 import Sanpham from "./component/client/home/sanpham/sanpham"
 import DetailSanpham from "./component/client/home/sanpham/detailsanpham"
 import DangNhap from "./component/client/home/nguoidung/dangnhap"
@@ -56,6 +57,7 @@ function App() {
         <Route path="bills" element={<BillAdmin />} />
         <Route path="products" element={<ProductAdmin />} />
         <Route path="categories" element={<CategoryAdmin />} />
+        <Route path="reviews" element={<ReviewAdmin />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />
